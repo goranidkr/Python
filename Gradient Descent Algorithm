@@ -1,0 +1,77 @@
+import numpy as np #벡터, 행렬 등 수치 연산을 수행하는 선형대수 라이브러리
+import pandas as pd #데이터분석을 위한 라이브러리
+import matplotlib.pyplot as plt #그래프를 그릴 수 있는 라이브러리
+
+# 공부 시간 X와 성적 Y의 리스트를 만들기
+data = [[2, 83], [4, 93], [6, 89], [10, 97]]#배열을 통해 공부 시간과 성적을 data에 담았다.
+x = [i[0] for i in data]
+y = [i[1] for i in data]
+
+# 그래프 나타내기
+fig = plt.figure(figsize=(10,5))#figure()함수는 matplotlib에서 figure를 만들고 편집할 수 있게 만들어 주는 함수이다.
+ax = fig.add_subplot() # 그림 프레임 생성
+fig.patch.set_facecolor('gray')#그래프외부 배경색 지정
+ax.patch.set_facecolor('white')#그래프 내부 배경색 지정
+# 리스트로 되어 있는 x와 y 값을 넘파이 배열로 바꾸기(인덱스를 주어 하나씩 불러와 계산이 가능하게 하기 위함)
+x_data = np.array(x)
+y_data = np.array(y)
+
+#초기화
+a = 0 #기울기
+b = 0 #절편
+
+# 학습률 정하기
+lr = 0.01
+
+# 몇 번 반복될지 설정(0부터 세므로 원하는 반복 횟수에 +1)
+epochs = 1001
+
+# 경사 하강법 시작
+for i in range(epochs):     # 에포크 수만큼 반복
+  #한 번의 epoch는 인공 신경망에서 전체 데이터 셋에 대해
+  #forward pass/backward pass 과정을 거친 것을 말함.
+  #즉, 전체 데이터 셋에 대해 한 번 학습을 완료한 상태이다.
+    y_pred = a * x_data + b # y를 구하는 식 세우기
+    error = y_data - y_pred # 오차를 구하는 식
+    # 오차 함수를 a로 미분한 값
+    a_diff = -(1/len(x_data)) * sum(x_data * (error))
+    # 오차 함수를 b로 미분한 값
+    b_diff = -(1/len(x_data)) * sum(y_data - y_pred)
+
+    a = a - lr * a_diff # 학습률을 곱해 기존의 a값 업데이트
+    b = b - lr * b_diff # 학습률을 곱해 기존의 b값 업데이트
+
+    if i % 100 == 0:    # 100번 반복될 때마다 현재의 a값 , b값 출력
+        print("epoch=%.f, 기울기=%.02f, 절편=%.02f" % (i, a, b))
+
+# 앞서 구한 기울기와 절편을 이용해 그래프를 다시 그리기
+y_pred = a * x_data + b
+plt.scatter(x, y, color='blue',linewidth=3, label="students")#산점도 그래프를 그릴 것을 지정
+plt.plot([min(x_data), max(x_data)], 
+         [min(y_pred), max(y_pred)], 
+         color='red', 
+         linewidth=3, 
+         label="Effect of study time"
+         )#그래프 그리기
+
+plt.legend()#범례(legend)
+
+plt.xticks(size=20)#x축 라벨 폰트 사이즈 지정
+plt.yticks(size=20)#y축 라벨 폰트 사이즈 지정
+
+ax.spines['right'].set_visible(False)#오른쪽 테두리 제거
+ax.spines['top'].set_visible(False) #위 테두리 제거
+
+plt.xlabel('Study time',fontsize=15,position=(1,0))#x축 라벨
+plt.ylabel('Score',fontsize=15,rotation=0,position=(0,1))#y축 라벨
+
+plt.title('Gradient Descent Algorithm', #제목
+          fontdict=title_font, #타이틀
+          loc='center', #글자 배치
+          pad=10, #그래프와 글자 사이의 간격
+          size=20, #글자 크기
+          color = 'blue',#글자 색상
+          fontweight='bold'#폰트 굷기
+          )#그래프 타이틀
+
+plt.show()#그래프보여주기
